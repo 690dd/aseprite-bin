@@ -21,7 +21,7 @@ jobs:
 
       steps:
         - name: Checkout
-          uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+          uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
 
         - name: Build
           id: build
@@ -31,7 +31,7 @@ jobs:
             ASEPRITE_VERSION: ${{ github.event.inputs.version }}
 
         - name: Archive
-          uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+          uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
           with:
             name: aseprite-${{ steps.build.outputs.ASEPRITE_VERSION }}
             path: github
