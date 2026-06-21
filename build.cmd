@@ -130,8 +130,11 @@
     exit /b 1
   )
 
-  python -c "v = open('aseprite/src/ver/CMakeLists.txt').read(); open('aseprite/src/ver/CMakeLists.txt', 'w').write(v.replace('1.x-dev',
-  '%ASEPRITE_VERSION%'[1:]))" || (
+  powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+    "$p='aseprite/src/ver/CMakeLists.txt';" ^
+    "$v=[IO.File]::ReadAllText($p);" ^
+    "$ver=$env:ASEPRITE_VERSION.Substring(1);" ^
+    "[IO.File]::WriteAllText($p,$v.Replace('1.x-dev',$ver))" || (
     echo ERROR: failed to patch aseprite version file
     exit /b 1
   )
