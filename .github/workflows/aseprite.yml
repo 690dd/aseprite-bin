@@ -1,31 +1,39 @@
-
 name: aseprite
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to build, leave empty for latest"
-        required: false
+    workflow_dispatch:
+      inputs:
+        version:
+          description: "Exact Aseprite tag to build, e.g. v1.3.15. Leave empty for latest tag."
+          required: false
+
+permissions:
+    contents: read
+
+concurrency:
+    group: aseprite-build
+    cancel-in-progress: false
 
 jobs:
-  build:
-    runs-on: windows-2025
-    steps:
+    build:
+      runs-on: windows-2022
+      timeout-minutes: 120
 
-      - name: Checkout
-        uses: actions/checkout@v4
+      steps:
+        - name: Checkout
+          uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
-      - name: Build
-        id: build
-        shell: cmd
-        run: call build.cmd
-        env:
-          ASEPRITE_VERSION: ${{ github.event.inputs.version }}
+        - name: Build
+          id: build
+          shell: cmd
+          run: call build.cmd
+          env:
+            ASEPRITE_VERSION: ${{ github.event.inputs.version }}
 
-      - name: Archive
-        uses: actions/upload-artifact@v4
-        with:
-          name: aseprite-${{ steps.build.outputs.ASEPRITE_VERSION }}
-          path: github
-          if-no-files-found: error
+        - name: Archive
+          uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+          with:
+            name: aseprite-${{ steps.build.outputs.ASEPRITE_VERSION }}
+            path: github
+            if-no-files-found: error
+            retention-days: 7
