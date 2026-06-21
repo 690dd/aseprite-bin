@@ -19,10 +19,12 @@
   )
 
   rem *** Validate user-provided Aseprite version before using it in commands.
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "if ($env:ASEPRITE_VERSION -and $env:ASEPRITE_VERSION -notmatch
-  '^v\d+(\.\d+)+(?:[-\w\.]*)?$') { Write-Error 'Invalid ASEPRITE_VERSION'; exit 1 }" || (
-    echo ERROR: invalid ASEPRITE_VERSION: %ASEPRITE_VERSION%
-    exit /b 1
+
+  if not "%ASEPRITE_VERSION%" equ "" (
+    echo %ASEPRITE_VERSION%| findstr /R "^v[0-9][0-9]*\.[0-9][0-9]*" >nul || (
+      echo ERROR: invalid ASEPRITE_VERSION: %ASEPRITE_VERSION%
+      exit /b 1
+    )
   )
 
 
@@ -51,8 +53,7 @@
       exit /b 1
     )
 
-    certutil -hashfile ninja-win.zip SHA256 | findstr /I
-    "26A40FA8595694DEC2FAD4911E62D29E10525D2133C9A4230B66397774AE25BF" >nul || (
+    certutil -hashfile ninja-win.zip SHA256 | findstr /I "26A40FA8595694DEC2FAD4911E62D29E10525D2133C9A4230B66397774AE25BF" >nul || (
       echo ERROR: ninja-win.zip checksum mismatch
       exit /b 1
     )
@@ -89,8 +90,12 @@
     )
   )
 
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "if (-not $env:ASEPRITE_VERSION -or $env:ASEPRITE_VERSION
-  -notmatch '^v\d+(\.\d+)+(?:[-\w\.]*)?$') { Write-Error 'Invalid resolved ASEPRITE_VERSION'; exit 1 }" || (
+  if "%ASEPRITE_VERSION%" equ "" (
+    echo ERROR: failed to resolve ASEPRITE_VERSION
+    exit /b 1
+  )
+
+  echo %ASEPRITE_VERSION%| findstr /R "^v[0-9][0-9]*\.[0-9][0-9]*" >nul || (
     echo ERROR: invalid resolved ASEPRITE_VERSION: %ASEPRITE_VERSION%
     exit /b 1
   )
@@ -125,8 +130,8 @@
     exit /b 1
   )
 
-  python -c "v = open('aseprite/src/ver/CMakeLists.txt').read(); open('aseprite/src/ver/CMakeLists.txt',
-  'w').write(v.replace('1.x-dev', '%ASEPRITE_VERSION%'[1:]))" || (
+  python -c "v = open('aseprite/src/ver/CMakeLists.txt').read(); open('aseprite/src/ver/CMakeLists.txt', 'w').write(v.replace('1.x-dev',
+  '%ASEPRITE_VERSION%'[1:]))" || (
     echo ERROR: failed to patch aseprite version file
     exit /b 1
   )
@@ -144,8 +149,7 @@
     )
   )
 
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "if (-not $env:SKIA_VERSION -or $env:SKIA_VERSION -notmatch
-  '^m\d+-[0-9a-fA-F]+$') { Write-Error 'Invalid SKIA_VERSION'; exit 1 }" || (
+  echo %SKIA_VERSION%| findstr /R "^m[0-9][0-9]*-[0-9a-fA-F][0-9a-fA-F]*$" >nul || (
     echo ERROR: invalid SKIA_VERSION: %SKIA_VERSION%
     exit /b 1
   )
